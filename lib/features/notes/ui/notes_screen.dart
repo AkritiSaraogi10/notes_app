@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:interview_app/features/model/notes_model.dart';
 import 'package:interview_app/features/notes/bloc/notes_bloc.dart';
+import 'package:interview_app/features/notes/ui/alert.dart';
 import 'package:interview_app/features/notes_details/notes_details.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -13,14 +14,6 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreenState extends State<NotesScreen> {
   NotesBloc notesBloc = NotesBloc();
-  TextEditingController titleText = TextEditingController();
-  TextEditingController contentText = TextEditingController();
-
-  @override
-  void initState() {
-    notesBloc.add(NotesInitialEvent());
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,64 +22,36 @@ class _NotesScreenState extends State<NotesScreen> {
         title: const Text("Notes App"),
         backgroundColor: Colors.teal,
       ),
-      body: Container(
-        child: Column(children: [
-          addNotesWidget(),
-          Expanded(
-            child: BlocConsumer<NotesBloc, NotesState>(
-              buildWhen: (previous, current) => current is! NotesActionState,
-              listenWhen: (previous, current) => current is NotesActionState,
-              listener: (context, state) {},
-              builder: (context, state) {
-                print("state" + state.runtimeType.toString());
-                switch (state.runtimeType) {
-                  case NotesLoadingState:
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+      body: BlocConsumer<NotesBloc, NotesState>(
+        bloc: notesBloc, // this was missed
+        buildWhen: (previous, current) => current is! NotesActionState,
+        listenWhen: (previous, current) => current is NotesActionState,
+        listener: (context, state) {},
+        builder: (context, state) {
+          switch (state.runtimeType) {
+            case NotesLoadingState:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
 
-                  case NotesSuccessLoadedState:
-                    final successSate = state as NotesSuccessLoadedState;
-                    return ListView.builder(
-                        itemCount: successSate.notesList.length,
-                        itemBuilder: (context, index) {
-                          print("here ${successSate.notesList[index]}");
-                          return notesWidget(successSate.notesList[index]);
-                        });
-                  default:
-                    return SizedBox();
-                }
-              },
-            ),
-          )
-        ]),
+            case NotesSuccessLoadedState:
+              final successSate = state as NotesSuccessLoadedState;
+              return ListView.builder(
+                  itemCount: successSate.notesList.length,
+                  itemBuilder: (context, index) {
+                    return notesWidget(successSate.notesList[index]);
+                  });
+            default:
+              return const SizedBox();
+          }
+        },
       ),
-    );
-  }
-
-  Widget addNotesWidget() {
-    return Column(
-      children: [
-        TextField(
-          controller: titleText,
-          decoration: const InputDecoration(hintText: "Add Title"),
-        ),
-        TextField(
-          controller: contentText,
-          decoration: const InputDecoration(hintText: "Add Content"),
-        ),
-        ElevatedButton(
-            onPressed: () {
-              if (titleText.text.isNotEmpty && contentText.text.isNotEmpty) {
-                notesBloc.add(NotesAddEvent(
-                    notesModel: NotesModel(
-                        id: DateTime.now().toString(),
-                        title: titleText.text,
-                        content: contentText.text)));
-              }
-            },
-            child: const Text("Add"))
-      ],
+      floatingActionButton: IconButton(
+        icon: const Icon(Icons.add),
+        onPressed: () {
+          _showAddPostDialog(context: context);
+        },
+      ),
     );
   }
 
@@ -98,26 +63,56 @@ class _NotesScreenState extends State<NotesScreen> {
                   notesModel: notes,
                 )));
       },
-      child: Column(
-        children: [
-          Text(notes.title),
-          Text(notes.content),
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    notesBloc.add(NotesUpdateEvent(notesModel: notes));
-                  },
-                  icon: Icon(Icons.edit)),
-              IconButton(
-                  onPressed: () {
-                    notesBloc.add(NotesDeleteEvent(id: notes.id));
-                  },
-                  icon: Icon(Icons.delete))
-            ],
-          )
-        ],
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: Colors.grey.shade100),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Title: ${notes.title}"),
+                Row(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          _showAddPostDialog(
+                              context: context,
+                              notesModel: notes,
+                              isUpdate: true);
+                        },
+                        icon: const Icon(Icons.edit)),
+                    IconButton(
+                        onPressed: () {
+                          notesBloc.add(NotesDeleteEvent(id: notes.id));
+                        },
+                        icon: const Icon(Icons.delete))
+                  ],
+                ),
+              ],
+            ),
+            Text("content : ${notes.content}"),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showAddPostDialog(
+      {required BuildContext context,
+      isUpdate = false,
+      NotesModel notesModel = const NotesModel()}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Alert(
+          context: context,
+          notesBloc: notesBloc,
+          isUpdate: isUpdate,
+          notesModel: notesModel,
+        );
+      },
     );
   }
 }

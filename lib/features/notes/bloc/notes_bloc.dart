@@ -9,26 +9,25 @@ part 'notes_state.dart';
 
 class NotesBloc extends Bloc<NotesEvent, NotesState> {
   NotesBloc() : super(NotesInitial()) {
+    on<GetAllNotesInitialEvent>(notesInitialEvent);
     on<NotesAddEvent>(notesAddEvent);
     on<NotesUpdateEvent>(notesUpdateEvent);
-    on<NotesInitialEvent>(notesInitialEvent);
     on<NotesDeleteEvent>(notesDeleteEvent);
   }
   FutureOr<void> notesInitialEvent(
-      NotesInitialEvent event, Emitter<NotesState> emit) async {
+      GetAllNotesInitialEvent event, Emitter<NotesState> emit) async {
     emit(NotesLoadingState());
     //Added the delay of 3 seconds to show loader
-    // await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     emit(NotesSuccessLoadedState(notesList: notesList));
   }
 
   FutureOr<void> notesAddEvent(NotesAddEvent event, Emitter<NotesState> emit) {
-    // emit(NotesLoadingState());
+    emit(NotesLoadingState());
     //added the new note
-    print(event.notesModel.content);
     notesList.add(event.notesModel);
-    print(notesList);
-    emit(NotesSuccessLoadedState(notesList: notesList));
+
+    emit(NotesSuccessLoadedState(notesList: (notesList)));
   }
 
   FutureOr<void> notesUpdateEvent(

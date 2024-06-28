@@ -2,8 +2,14 @@ class NotesModel {
   final String id;
   final String title;
   final String content;
+  final String reminderTime;
 
-  NotesModel({required this.id, required this.title, required this.content});
+  const NotesModel({
+    this.id = "",
+    this.title = "",
+    this.content = "",
+    this.reminderTime = "",
+  });
 }
 
 List<NotesModel> notesList = [];

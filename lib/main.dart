@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: BlocProvider(
-        create: (context) => NotesBloc(),
-        child: NotesScreen(),
+        create: (_) => NotesBloc()..add(GetAllNotesInitialEvent()),
+        child: const NotesScreen(),
       ),
       debugShowCheckedModeBanner: false,
     );

@@ -15,8 +15,12 @@ class _NotesDetailsPageState extends State<NotesDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Details Screen"),
+        backgroundColor: Colors.teal,
       ),
       body: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
+        width: double.maxFinite,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.teal)),
