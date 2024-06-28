@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:interview_app/features/model/notes_model.dart';
 import 'package:interview_app/features/notes/bloc/notes_bloc.dart';
+import 'package:interview_app/features/notes_details/notes_details.dart';
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
@@ -68,11 +69,11 @@ class _NotesScreenState extends State<NotesScreen> {
       children: [
         TextField(
           controller: titleText,
-          decoration: InputDecoration(hintText: "Add Title"),
+          decoration: const InputDecoration(hintText: "Add Title"),
         ),
         TextField(
           controller: contentText,
-          decoration: InputDecoration(hintText: "Add Content"),
+          decoration: const InputDecoration(hintText: "Add Content"),
         ),
         ElevatedButton(
             onPressed: () {
@@ -89,10 +90,33 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  Widget notesWidget(NotesModel notesList) {
-    return Container(
+  Widget notesWidget(NotesModel notes) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => NotesDetailsPage(
+                  notesModel: notes,
+                )));
+      },
       child: Column(
-        children: [Text(notesList.title), Text(notesList.content)],
+        children: [
+          Text(notes.title),
+          Text(notes.content),
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    notesBloc.add(NotesUpdateEvent(notesModel: notes));
+                  },
+                  icon: Icon(Icons.edit)),
+              IconButton(
+                  onPressed: () {
+                    notesBloc.add(NotesDeleteEvent(id: notes.id));
+                  },
+                  icon: Icon(Icons.delete))
+            ],
+          )
+        ],
       ),
     );
   }
