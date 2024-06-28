@@ -82,14 +82,14 @@ class _AlertState extends State<Alert> {
                         id: DateTime.now().toString(),
                         title: title,
                         content: body,
-                        reminderTime: DateTime.now().toString(),
+                        createdTime: DateTime.now().toString(),
                       )))
                     : widget.notesBloc.add(NotesUpdateEvent(
                         notesModel: NotesModel(
                           id: widget.notesModel.id,
                           title: title,
                           content: body,
-                          reminderTime: DateTime.now().toString(),
+                          createdTime: DateTime.now().toString(),
                         ),
                       ));
                 Navigator.of(context).pop();

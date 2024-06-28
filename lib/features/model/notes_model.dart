@@ -2,14 +2,15 @@ class NotesModel {
   final String id;
   final String title;
   final String content;
-  final String reminderTime;
+  final String createdTime;
+  int count;
 
-  const NotesModel({
-    this.id = "",
-    this.title = "",
-    this.content = "",
-    this.reminderTime = "",
-  });
+  NotesModel(
+      {this.id = "",
+      this.title = "",
+      this.content = "",
+      this.createdTime = "",
+      this.count = 3});
 }
 
 List<NotesModel> notesList = [];
